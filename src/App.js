@@ -1,14 +1,17 @@
 import { useEffect, useState } from 'react'
 import './App.css'
+import Area from './components/Area'
+import ChartItem from './components/ChartItem'
 
 function App() {
 
+  /* BACKEND - Start */
   const initializeFirstValue = () => {
     return Math.floor(Math.random() * (10000 - 500 + 1)) + 500  // Getting number number between 500 and 10000. 
   }
 
   const getRandomNumber=()=>{
-    return Math.floor(Math.random() * 30 + 1)  // Getting number number between 0 and 30.
+    return Math.floor(Math.random() * 50 + 1)  // Getting number number between 0 and 50.
   }
 
   const [barData, setBarData] = useState([
@@ -53,22 +56,33 @@ function App() {
   const addBarDataValuesWithRandom = () => {
     let data = [...barData]
     data.forEach( (item) => {
-      if(Math.random() > 0.3){  // 30% probability, it will not add any value
+      if(Math.random() > 0.5){  // 50% probability, it will not add any value
         item.value += getRandomNumber()
       }
     })
+    setSortedBarData(data)
     setBarData(data)
   }
 
   const renderBarItem = (item, index) => {
     let rate = item.value / sortedBarData[0].value
     const percentageDivWidth = rate * 95
+    
+    return <ChartItem
+      key={item.id}
+      backgroundColor={item.color}
+      width={percentageDivWidth+"%"}
+      title={item.title}
+      value={item.value}
+      top={(index===0?10:(index*40)+20)+'px'}
+    />
+
   }
 
   useEffect(() => {
     const updater = setInterval( () => {
       addBarDataValuesWithRandom()
-    }, 500)  
+    }, 10)  
   }, [])
 
   useEffect(() => {
@@ -76,11 +90,18 @@ function App() {
       renderBarItem(item)
      })
   }, [barData])
+
+  /* BACKEND - End */
+
+  const [chartTitle, setChartTitle] = useState("Customer Number of The Companies")
   
   return (
-    <div>
-      
-    </div>
+    <>
+      <div className="chart-title">{chartTitle}</div>
+      <Area data={barData}>
+        {barData.map( (item, index) => renderBarItem(item, index) )}
+      </Area>
+    </>
   )
 }
 
